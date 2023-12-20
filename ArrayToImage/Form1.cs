@@ -7,23 +7,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace ArrayToImage
 {
     public partial class Form1 : Form
     {
-        Bitmap TestImage;
+        Bitmap ArrayImage;
+        Bitmap ReferenceImage;
+        BackgroundWorker worker;
+
         public Form1()
         {
             InitializeComponent();
-            TestImage = null;
+
+            ArrayImage = null;
+            ReferenceImage = null;
+
+            //Thread객체 생성
+            worker = new BackgroundWorker();
+
+            // 이벤트 핸들러 지정
+            worker.DoWork += new DoWorkEventHandler(worker_DoWork);
+            worker.ProgressChanged += new ProgressChangedEventHandler(worker_ProgressChanged);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
+
+            worker.WorkerReportsProgress = true;
         }
 
         private void pDisplay_Paint(object sender, PaintEventArgs e)
         {
-            if(TestImage != null)
+            if(ArrayImage != null)
             {
-                e.Graphics.DrawImage(TestImage, new Rectangle(0, 0, TestImage.Width, TestImage.Height));
+                e.Graphics.DrawImage(ArrayImage, new Rectangle(0, 0, ArrayImage.Width, ArrayImage.Height));
             }
         }
 
@@ -63,13 +79,13 @@ namespace ArrayToImage
                 }
             }
 
-            TestImage = new Bitmap(width, height);
+            ArrayImage = new Bitmap(width, height);
             for (int row = 0; row < height; row++)
             {
                 for (int col = 0; col < width; col++)
                 {
                     Color color = Color.FromArgb((int)array[col + row * width]);
-                    TestImage.SetPixel(col, row, color);
+                    ArrayImage.SetPixel(col, row, color);
                 }
             }
 
@@ -79,7 +95,78 @@ namespace ArrayToImage
 
         private void btnConvertImageToArray_Click(object sender, EventArgs e)
         {
+            if(worker.IsBusy)
+            {
+                return;
+            }
 
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Image File(*.bmp;*.png;*.jpg)|*.bmp;*.png;*.jpg";
+            DialogResult result = dialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                ReferenceImage = new Bitmap(dialog.FileName);
+
+                progImageToArray.Value = 0;
+                progImageToArray.Maximum = 100;
+
+                btnConvertImageToArray.Enabled = false;
+
+                worker.RunWorkerAsync();
+            }
+        }
+
+        // Worker Thread가 실제 하는 일
+        void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if(ReferenceImage == null)
+            {
+                return;
+            }
+
+            int width = ReferenceImage.Width;
+            int height = ReferenceImage.Height;
+
+            try
+            {
+                this.BeginInvoke(new Action(delegate {
+                    rtbArray.Clear();
+                }));
+                for (int row = 0; row < height; row++)
+                {
+                    string append = "";
+                    for (int col = 0; col < width; col++)
+                    {
+                        Color color = ReferenceImage.GetPixel(col, row);
+                        int argb = color.ToArgb();
+
+                        string str_argb = argb.ToString("X8");
+
+                        append += "0x" + str_argb + ",\n";
+                    }
+                    worker.ReportProgress((row+1) * 100 / height);
+                    this.BeginInvoke(new Action(delegate {
+                        rtbArray.AppendText(append);
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        // Progress 리포트 - UI Thread
+        void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            this.progImageToArray.Value = e.ProgressPercentage;
+        }
+
+        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            lblArrayCount.Text = "line count : " + rtbArray.Lines.Count<string>().ToString();
+            btnConvertImageToArray.Enabled = true;
         }
     }
 }

@@ -38,6 +38,8 @@ namespace ArrayToImage
             this.nImageWidth = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.progImageToArray = new System.Windows.Forms.ProgressBar();
+            this.lblArrayCount = new System.Windows.Forms.Label();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nImageHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nImageWidth)).BeginInit();
@@ -63,6 +65,9 @@ namespace ArrayToImage
             // 
             // panel2
             // 
+            this.panel2.AutoScroll = true;
+            this.panel2.Controls.Add(this.lblArrayCount);
+            this.panel2.Controls.Add(this.progImageToArray);
             this.panel2.Controls.Add(this.btnConvertImageToArray);
             this.panel2.Controls.Add(this.btnConvertArrayToImage);
             this.panel2.Controls.Add(this.nImageHeight);
@@ -73,12 +78,12 @@ namespace ArrayToImage
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(234, 542);
+            this.panel2.Size = new System.Drawing.Size(234, 599);
             this.panel2.TabIndex = 2;
             // 
             // btnConvertImageToArray
             // 
-            this.btnConvertImageToArray.Location = new System.Drawing.Point(15, 492);
+            this.btnConvertImageToArray.Location = new System.Drawing.Point(15, 529);
             this.btnConvertImageToArray.Name = "btnConvertImageToArray";
             this.btnConvertImageToArray.Size = new System.Drawing.Size(171, 23);
             this.btnConvertImageToArray.TabIndex = 5;
@@ -88,7 +93,7 @@ namespace ArrayToImage
             // 
             // btnConvertArrayToImage
             // 
-            this.btnConvertArrayToImage.Location = new System.Drawing.Point(15, 463);
+            this.btnConvertArrayToImage.Location = new System.Drawing.Point(15, 454);
             this.btnConvertArrayToImage.Name = "btnConvertArrayToImage";
             this.btnConvertArrayToImage.Size = new System.Drawing.Size(171, 23);
             this.btnConvertArrayToImage.TabIndex = 5;
@@ -150,11 +155,26 @@ namespace ArrayToImage
             this.label1.TabIndex = 2;
             this.label1.Text = "Width :";
             // 
+            // progImageToArray
+            // 
+            this.progImageToArray.Location = new System.Drawing.Point(15, 500);
+            this.progImageToArray.Name = "progImageToArray";
+            this.progImageToArray.Size = new System.Drawing.Size(171, 23);
+            this.progImageToArray.TabIndex = 7;
+            // 
+            // lblArrayCount
+            // 
+            this.lblArrayCount.AutoSize = true;
+            this.lblArrayCount.Location = new System.Drawing.Point(13, 555);
+            this.lblArrayCount.Name = "lblArrayCount";
+            this.lblArrayCount.Size = new System.Drawing.Size(0, 12);
+            this.lblArrayCount.TabIndex = 8;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(749, 542);
+            this.ClientSize = new System.Drawing.Size(749, 599);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.pDisplay);
             this.Name = "Form1";
@@ -178,6 +198,8 @@ namespace ArrayToImage
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnConvertArrayToImage;
         private System.Windows.Forms.Button btnConvertImageToArray;
+        private System.Windows.Forms.ProgressBar progImageToArray;
+        private System.Windows.Forms.Label lblArrayCount;
     }
 }
 

@@ -8,11 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using System.IO;
 
 namespace ArrayToImage
 {
     public partial class Form1 : Form
     {
+        OpenFileDialog open_dialog;
         Bitmap ArrayImage;
         Bitmap ReferenceImage;
         BackgroundWorker worker;
@@ -23,6 +25,9 @@ namespace ArrayToImage
 
             ArrayImage = null;
             ReferenceImage = null;
+
+            open_dialog = new OpenFileDialog();
+            open_dialog.Filter = "Raw Files(*.raw)|*.raw";
 
             //Thread객체 생성
             worker = new BackgroundWorker();
@@ -85,6 +90,44 @@ namespace ArrayToImage
                 for (int col = 0; col < width; col++)
                 {
                     Color color = Color.FromArgb((int)array[col + row * width]);
+                    ArrayImage.SetPixel(col, row, color);
+                }
+            }
+
+            pDisplay.Size = new Size(width, height);
+            pDisplay.Invalidate();
+        }
+
+        private void btnConvertBinToImage_Click(object sender, EventArgs e)
+        {
+            int width = (int)nImageWidth.Value;
+            int height = (int)nImageHeight.Value;
+
+            if (width == 0)
+            {
+                return;
+            }
+            if (height == 0)
+            {
+                return;
+            }
+
+            if (DialogResult.OK != open_dialog.ShowDialog())
+            {
+                return;
+            }
+
+            string FilePath = open_dialog.FileName;
+            FileStream file = File.OpenRead(FilePath);
+            BinaryReader reader = new BinaryReader(file);
+            
+            ArrayImage = new Bitmap(width, height);
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    int data = reader.ReadInt32();
+                    Color color = Color.FromArgb(data);
                     ArrayImage.SetPixel(col, row, color);
                 }
             }
@@ -168,5 +211,6 @@ namespace ArrayToImage
             lblArrayCount.Text = "line count : " + rtbArray.Lines.Count<string>().ToString();
             btnConvertImageToArray.Enabled = true;
         }
+
     }
 }
